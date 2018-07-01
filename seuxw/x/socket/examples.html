@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <script>
+        window.addEventListener("load", function(evt) {
+            var output = document.getElementById("output");
+            var input = document.getElementById("input");
+            var ws;
+
+            var print = function(message) {
+                var d = document.createElement("div");
+                d.innerHTML = message;
+                output.appendChild(d);
+            };
+
+            var makehead = function(sn, id) {
+                var buffer = new ArrayBuffer(8);
+                var dataView = new DataView(buffer);
+                dataView.setInt32(0, sn);
+                dataView.setInt32(4, id);
+                return buffer
+            }
+
+            document.getElementById("connect").onclick = function(evt) {
+                if (ws) {
+                    return false;
+                }
+                ws = new WebSocket("ws://127.0.0.1:20001/auth?id=100&user=aaa&pwd=bbb&cer=123456");
+                ws.binaryType = 'blob';
+                ws.onopen = function(evt) {
+                    print("connected...");
+                }
+                ws.onclose = function(evt) {
+                    print("closed...");
+                    ws = null;
+                }
+                ws.onmessage = function(evt) {
+                    var reader = new FileReader();
+                    reader.onload = function() {
+                        print("recv: " + reader.result);
+                    }
+                    reader.readAsText(evt.data);
+                }
+                ws.onerror = function(evt) {
+                    print("error: " + evt.data);
+                }
+                return false;
+            };
+
+            document.getElementById("send").onclick = function(evt) {
+                if (!ws) {
+                    return false;
+                }
+                print("send: " + input.value);
+                var head = makehead(0, 80000005)
+                var blob = new Blob([head, input.value]);
+                ws.send(blob);
+                return false;
+            };
+
+            document.getElementById("close").onclick = function(evt) {
+                if (!ws) {
+                    return false;
+                }
+                ws.close();
+                return false;
+            };
+        });
+    </script>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td valign="top" width="50%">
+                <form>
+                    <button id="connect">connect</button>
+                    <button id="close">close</button>
+                    <p><input id="input" type="text" value='{"id":3210}'>
+                        <button id="send">send</button>
+                </form>
+            </td>
+            <td valign="top" width="60%">
+                <div id="output"></div>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

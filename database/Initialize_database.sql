@@ -1,0 +1,1 @@
+-- Initialize database for project seuxw.cc.

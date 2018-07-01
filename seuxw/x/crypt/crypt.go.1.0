@@ -1,0 +1,95 @@
+package crypt
+
+import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/pem"
+	"errors"
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
+	"time"
+)
+
+var (
+	invalid  = errors.New("token invalid")
+	mismatch = errors.New("token mismatch")
+	ipdrift  = errors.New("token ipdrift")
+	timeout  = errors.New("token timeout")
+)
+
+func EncryptPwd(pwd string) string {
+	// hashing the password with the default cost of 10
+	hashed, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return string(hashed)
+}
+
+func ValidatePwd(hashed, pwd string) error {
+	// comparing the password with the hash
+	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(pwd))
+}
+
+func NewToken(id, ip string, t time.Duration, priv []byte) string {
+	token := signatureToken([]byte(fmt.Sprintf("%s %s %d", id, ip, time.Now().Add(t).Unix())), priv)
+
+	return base64.URLEncoding.EncodeToString(token)
+}
+
+func NewExpiresToken(id, ip string, expires time.Time, priv []byte) string {
+	token := signatureToken([]byte(fmt.Sprintf("%s %s %d", id, ip, expires.Unix())), priv)
+
+	return base64.URLEncoding.EncodeToString(token)
+}
+
+func ValidateToken(id, token, ip string, priv []byte) error {
+	data, err := base64.URLEncoding.DecodeString(token)
+	if err != nil {
+		return err
+	}
+	if data = decodeToken(data, priv); data == nil {
+		return invalid
+	}
+
+	var _t int
+	var _id, _ip string
+	if _, err := fmt.Sscanf(string(data), "%s %s %d", &_id, &_ip, &_t); err != nil {
+		return err
+	}
+
+	//println("verify:", data, id, _id, ip, _ip, _t)
+	if id != _id {
+		return mismatch
+	}
+	if ip != _ip {
+		return ipdrift
+	}
+	if time.Now().After(time.Unix(int64(_t), 0)) {
+		return timeout
+	}
+
+	return nil
+}
+
+func signatureToken(text, key []byte) (b []byte) {
+	if block, _ := pem.Decode(key); block != nil {
+		if pi, err := x509.ParsePKIXPublicKey(block.Bytes); err == nil {
+			if pub, ok := pi.(*rsa.PublicKey); ok && pub != nil {
+				b, _ = rsa.EncryptPKCS1v15(rand.Reader, pub, text)
+			}
+		}
+	}
+	return
+}
+
+func decodeToken(cipher, key []byte) (b []byte) {
+	if block, _ := pem.Decode(key); block != nil {
+		if priv, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
+			b, _ = rsa.DecryptPKCS1v15(rand.Reader, priv, cipher)
+		}
+	}
+	return
+}
