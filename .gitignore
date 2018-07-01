@@ -26,4 +26,4 @@ _testmain.go
 _output/
 debug
 
-config/
+config.go

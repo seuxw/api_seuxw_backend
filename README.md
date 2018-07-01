@@ -3,7 +3,9 @@ Backend system code for [seuxw.cc](http://seuxw.cc), based on [Golang](https://g
 ```
     seuxw.cc 项目的 HTTP API 服务后端系统代码，基于 Golang 和 Python3 开发。
 
-    seuxw.cc 项目始于 2014 年，是一个以 “东大小微” 为虚拟载体，为东南大学本科生提供线上服务的平台。主要提供的服务包括了学生信息查询、基础娱乐功能、个人定制功能等，服务的平台囊括 QQ Robot、 Qzone、 Web 等。目前项目的用户量约 6000 人次。
+    seuxw.cc 是一个以 “东大小微” 为虚拟载体，为东南大学本科生提供线上服务的平台。
+    主要提供的服务包括了学生信息查询、基础娱乐功能、个人定制功能等，服务的平台囊括 QQ Robot、 Qzone、 Web 等。
+    项目始于 2014 年，目前项目的用户量约 6000 人次。
 ```
 
 ## 1. 项目简介
