@@ -3,23 +3,24 @@ package test
 import (
 	"database/sql"
 	"fmt"
-	"seuxw/embrice/constant/config"
+	"seuxw/embrice/config"
 	"seuxw/x/logger"
 	_ "seuxw/x/mysql"
 	"seuxw/x/sqlx"
 )
+
 
 type Database struct {
 	*sqlx.DB
 	log *logger.Logger
 }
 
+
 func NewDB(log *logger.Logger, maxConns, maxIdles int) *Database {
+	config, _ := config.ReadDBConfig()
 	db := &Database{
 		log: log,
-		DB: sqlx.MustConnect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-			config.DATABASE_USERNAME, config.DATABASE_PASSWORD, config.DATABASE_HOST, config.
-				DATABASE_PORT, config.DATABASE_NAME)), //连接数据库
+		DB: sqlx.MustConnect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",config.DBUser, config.DBPwd, config.DBHost, config.DBPort, config.DBName)), //连接数据库
 	}
 	db.SetMaxOpenConns(maxConns)
 	db.SetMaxIdleConns(maxIdles)
