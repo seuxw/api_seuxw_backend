@@ -1,12 +1,11 @@
 package config
 
 import (
-	"fmt"
 	"seuxw/embrice/entity"
 	"gopkg.in/ini.v1"
 )
 
-var configPath = "/data/seuxw.cfg"
+var configPath = "/data/config/seuxw.cfg"
 
 func ReadDBConfig() (entity.Database, error){
 
@@ -22,6 +21,5 @@ func ReadDBConfig() (entity.Database, error){
 	if err != nil {
 	  return config, err
 	}
-	fmt.Println(config)
 	return config, nil
 }

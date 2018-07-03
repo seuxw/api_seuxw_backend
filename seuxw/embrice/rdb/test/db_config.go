@@ -17,13 +17,18 @@ type Database struct {
 
 
 func NewDB(log *logger.Logger, maxConns, maxIdles int) *Database {
-	config, _ := config.ReadDBConfig()
+	config, err := config.ReadDBConfig()
+	if err != nil {
+		log.Fatal("Connected to database failed. Please check the config file. Err:%s", err)
+	}
 	db := &Database{
 		log: log,
-		DB: sqlx.MustConnect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",config.DBUser, config.DBPwd, config.DBHost, config.DBPort, config.DBName)), //连接数据库
+		DB: sqlx.MustConnect("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		config.DBUser, config.DBPwd, config.DBHost, config.DBPort, config.DBName)), //连接数据库
 	}
 	db.SetMaxOpenConns(maxConns)
 	db.SetMaxIdleConns(maxIdles)
+	log.Trace("Connect to database [%s] succeed.", config.DBName)
 	return db
 }
 

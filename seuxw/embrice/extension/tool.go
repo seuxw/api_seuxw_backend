@@ -8,6 +8,8 @@ import (
 	"seuxw/embrice/entity"
 	"seuxw/x/logger"
 	"time"
+	"strings"
+	"runtime"
 )
 
 const TIME_FORMAT = "2006-01-02 15:04:05"
@@ -119,4 +121,61 @@ func Precision(f float64, prec int, round bool) float64 {
 		return math.Trunc((f-0.5/pow10_n)*pow10_n) / pow10_n
 	}
 	return math.Trunc((f)*pow10_n) / pow10_n
+}
+
+type FuncInfo struct {
+	FuncName string
+	FileName string
+	Line     int
+	Status   bool
+}
+
+// GetFuncInfo 获取当前函数信息
+func GetFuncInfo() FuncInfo {
+	p, file, line, ok := runtime.Caller(2)
+	f := runtime.FuncForPC(p)
+	return FuncInfo{
+		FuncName: strings.Split(f.Name(), ".")[2],
+		FileName: file,
+		Line:     line,
+		Status:   ok,
+	}
+}
+
+// HandlerRequestLog 路由层请求添加Log日志
+func HandlerRequestLog(SeuxwRequest *entity.SeuxwRequest, body []byte, method string, processName string) error {
+	log := logger.NewStdLogger(true, true, true, true, true)
+	funcInfo := GetFuncInfo()
+
+	if method == "GET" {
+		log.Trace("[%s:%d] %s流程开始～ => TraceID: %s, URI: %s, UsrID: %d, UsrNm: %s", funcInfo.FuncName, funcInfo.Line, processName,
+			SeuxwRequest.TraceID, SeuxwRequest.Action, SeuxwRequest.AccountID, SeuxwRequest.RealName)
+	} else if method == "POST" {
+		log.Trace("[%s:%d] %s流程开始～ => TraceID: %s, URI: %s, Params: %s, UsrID: %d, UsrNm: %s", funcInfo.FuncName, funcInfo.Line, processName,
+			SeuxwRequest.TraceID, SeuxwRequest.Action, string(body), SeuxwRequest.AccountID, SeuxwRequest.RealName)
+	} else {
+		return fmt.Errorf("系统内部日志生成错误！")
+	}
+	return nil
+}
+
+// HandlerResponseLog 路由层请求添加Log日志
+func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Response, processName string, showData bool) {
+	var (
+		result string
+	)
+	log := logger.NewStdLogger(true, true, true, true, true)
+	funcInfo := GetFuncInfo()
+	if response.Code == 0 {
+		result = "成功"
+	} else {
+		result = "失败"
+	}
+	if showData {
+		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Data: %+v, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,
+			processName, result, SeuxwRequest.TraceID, response.Data, response.Message, response.Pagination)
+	} else {
+		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,
+			processName, result, SeuxwRequest.TraceID, response.Message, response.Pagination)
+	}
 }
