@@ -5,59 +5,61 @@ import (
 	"fmt"
 	"net/http"
 	"seuxw/embrice/entity/test"
+	"seuxw/embrice/entity"
 	"seuxw/embrice/extension"
 )
 
-func (self *server) TestGet(w http.ResponseWriter, r *http.Request) {
+func (self *server) Test(w http.ResponseWriter, r *http.Request) {
 	var (
-		getPara string
-		Test    test.Test
-		err     error
+		date 			string
+		response 		entity.Response
+		responseData    test.Test
+		err     		error
+		data 			[]byte
 	)
 
-	// 获取date参数
-	getPara = r.FormValue("date")
-	if len(getPara) == 0 {
-		getPara = extension.CurrentDateInStr()
-	}
+	seuxwRequest := entity.GetSeuxwRequest(r)
+	processName := "Test"
+	params := make(map[string]string, 0)
 
-	self.PrintTrace(r, fmt.Sprintf("date:%s", getPara), "GET：开始调用测试接口")
-
-	// 数据库操作
-	if Test, err = self.db.Test(getPara); err != nil {
-		err = fmt.Errorf("[Test]数据库调用错误！ %s", err)
-		goto END
-	}
-END:
-	extension.EndLabel(self.log, err, w, nil, Test)
-}
-
-func (self *server) TestPost(w http.ResponseWriter, r *http.Request) {
-	var (
-		getPara string
-		Test    test.Test
-		err     error
-	)
+	body, _ := extension.HandlerRequestLog(seuxwRequest, processName)
 
 	// 获取date参数
-	defer r.Body.Close()
-	if err = json.NewDecoder(r.Body).Decode(&Test); err != nil {
-		err = fmt.Errorf("[Test] Json decode err: %v", err)
-		goto END
-	}
+	if r.Method == "GET"{
+		date = r.FormValue("date")
 
-	getPara = Test.Date
-	if len(getPara) == 0 {
-		getPara = extension.CurrentDateInStr()
+	} else {
+		err = json.Unmarshal(body, &params)
+		date = params["date"]
+		if err != nil {
+			err = fmt.Errorf("Json 解析错误")
+			goto END
+		}
 	}
+	
+	fmt.Println("DEBUG:", date)
 
-	self.PrintTrace(r, fmt.Sprintf("date:%s", getPara), "POST：开始调用测试接口")
+	// 添加无值默认值 date = Today
+	if len(date) == 0 {
+		date = extension.CurrentDateInStr()
+	}
 
 	// 数据库操作
-	if Test, err = self.db.Test(getPara); err != nil {
-		err = fmt.Errorf("[Test]数据库调用错误！ %s", err)
+	responseData, err = self.db.Test(date)
+	if err != nil {
+		err = fmt.Errorf("数据库调用错误！ %s", err)
 		goto END
 	}
+	response.Data = responseData
+
 END:
-	extension.EndLabel(self.log, err, w, nil, Test)
+	if err != nil {
+		response.Code = 1
+		response.Message = fmt.Sprintf("%s", err)
+	}
+	data, _ = json.Marshal(&response)
+
+	extension.HandlerResponseLog(seuxwRequest, response, processName, true)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write([]byte(data))
 }

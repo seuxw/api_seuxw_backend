@@ -1,15 +1,14 @@
 package extension
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
-	"net/http"
 	"seuxw/embrice/entity"
 	"seuxw/x/logger"
 	"time"
 	"strings"
 	"runtime"
+	"io/ioutil"
 )
 
 const TIME_FORMAT = "2006-01-02 15:04:05"
@@ -62,55 +61,6 @@ func GetDateTime(inputTime time.Time, day int) int64 {
 	return time.Date(inputTime.Year(), inputTime.Month(), inputTime.Day()+day, 0, 0, 0, 0, time.Local).Unix()
 }
 
-// Api接口调用终点 - label END
-func EndLabel(log *logger.Logger, err error, w http.ResponseWriter, Pagination *entity.Pagination, ResponseData ...interface{}) {
-	var (
-		data       []byte
-		pagination []byte
-	)
-	// 如果请求结果有错误
-	if err != nil {
-		log.Error(fmt.Sprintf("%s", err))
-		data = []byte(fmt.Sprintf(`{"code":1,"message":"%v"}`, err))
-		goto END
-	}
-
-	// Marshal返回的data发生错误
-	if data, err = json.Marshal(&ResponseData); err != nil {
-		data = []byte(`{"code":1,"message":"json Marshal Err"}`)
-		goto END
-	}
-
-	/* 如果Pagination为空的情况（一般不是列表的查询结果都是空）*/
-	if Pagination == nil {
-		// 如果返回的数据为空
-		if string(data) == "[{}]" {
-			data = []byte(fmt.Sprintf(`{"code":0,"message":"success.","data":{}}`))
-			goto END
-		}
-		// 如果返回的data有数据
-		data = []byte(fmt.Sprintf(`{"code":0,"message":"success.","data":%v}`, string(data)[1:len(string(data))-1]))
-		goto END
-	}
-
-	/* 如果Pagination不为空的情况（一般data为数组）*/
-	if pagination, err = json.Marshal(Pagination); err != nil {
-		data = []byte(`{"code":1,"message":"json Marshal Err"}`)
-		goto END
-	}
-	// 如果返回的数组为空
-	if string(data) == "[null]" {
-		data = []byte(fmt.Sprintf(`{"code":0,"message":"success.","data":[], "pagination":%v}`, string(pagination)))
-		goto END
-	}
-	// 如果返回的是有数据的数组
-	data = []byte(fmt.Sprintf(`{"code":0,"message":"success.","data":%v, "pagination":%v}`, string(string(data[1:len(data)-1])), string(pagination)))
-
-END:
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write([]byte(data))
-}
-
 // 控制小数位
 func Precision(f float64, prec int, round bool) float64 {
 	pow10_n := math.Pow10(prec)
@@ -143,20 +93,23 @@ func GetFuncInfo() FuncInfo {
 }
 
 // HandlerRequestLog 路由层请求添加Log日志
-func HandlerRequestLog(SeuxwRequest *entity.SeuxwRequest, body []byte, method string, processName string) error {
+func HandlerRequestLog(SeuxwRequest *entity.SeuxwRequest, processName string) ([]byte, error) {
 	log := logger.NewStdLogger(true, true, true, true, true)
 	funcInfo := GetFuncInfo()
+	method := SeuxwRequest.RawRequest.Method
+	body, _ := ioutil.ReadAll(SeuxwRequest.RawRequest.Body)
 
 	if method == "GET" {
 		log.Trace("[%s:%d] %s流程开始～ => TraceID: %s, URI: %s, UsrID: %d, UsrNm: %s", funcInfo.FuncName, funcInfo.Line, processName,
 			SeuxwRequest.TraceID, SeuxwRequest.Action, SeuxwRequest.AccountID, SeuxwRequest.RealName)
 	} else if method == "POST" {
+		
 		log.Trace("[%s:%d] %s流程开始～ => TraceID: %s, URI: %s, Params: %s, UsrID: %d, UsrNm: %s", funcInfo.FuncName, funcInfo.Line, processName,
 			SeuxwRequest.TraceID, SeuxwRequest.Action, string(body), SeuxwRequest.AccountID, SeuxwRequest.RealName)
 	} else {
-		return fmt.Errorf("系统内部日志生成错误！")
+		return body, fmt.Errorf("系统内部日志生成错误！")
 	}
-	return nil
+	return body, nil
 }
 
 // HandlerResponseLog 路由层请求添加Log日志
@@ -172,7 +125,7 @@ func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Respo
 		result = "失败"
 	}
 	if showData {
-		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Data: %+v, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,
+		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Data: %#v, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,
 			processName, result, SeuxwRequest.TraceID, response.Data, response.Message, response.Pagination)
 	} else {
 		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,

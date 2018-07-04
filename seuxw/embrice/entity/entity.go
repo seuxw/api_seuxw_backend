@@ -30,6 +30,7 @@ type SeuxwRequest struct {
 	Info         string
 	AccountName  string
 	RealName     string
+	RawRequest	 *http.Request
 }
 
 // GetRequestHeader 获取 http 请求头参数
@@ -64,5 +65,6 @@ func GetSeuxwRequest(r *http.Request) *SeuxwRequest {
 		IP:           r.Header.Get("X-Forwarded-For"),
 		Action:       r.RequestURI,
 		RealName:     r.Header.Get("Account-RealName"),
+		RawRequest:	  r,
 	}
 }
