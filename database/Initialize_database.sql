@@ -4,6 +4,14 @@
 create database if not exists `seuxw`;
 use `seuxw`;
 
+-- 创建测试视图 sunrisetime
+drop view if exists `sunrisetime`;
+create view sunrisetime as
+select
+    *
+from
+    testsmallwei.sunrisetime;
+
 -----------------------
 --  数据表前缀说明
 --  sd-     Service Dimension   服务维度表
@@ -12,6 +20,13 @@ use `seuxw`;
 --
 --
 -----------------------
+
+-----------------------
+--
+--  用户项目表
+--
+-----------------------
+
 
 
 -- 创建用户表 sd_user
