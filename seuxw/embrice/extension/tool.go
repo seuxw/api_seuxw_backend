@@ -2,6 +2,7 @@ package extension
 
 import (
 	"fmt"
+	"encoding/json"
 	"math"
 	"seuxw/embrice/entity"
 	"seuxw/x/logger"
@@ -113,10 +114,11 @@ func HandlerRequestLog(SeuxwRequest *entity.SeuxwRequest, processName string) ([
 }
 
 // HandlerResponseLog 路由层请求添加Log日志
-func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Response, processName string, showData bool) {
+func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Response, processName string, showData bool) []byte{
 	var (
 		result string
 	)
+	data, _ := json.Marshal(&response)
 	log := logger.NewStdLogger(true, true, true, true, true)
 	funcInfo := GetFuncInfo()
 	if response.Code == 0 {
@@ -125,10 +127,11 @@ func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Respo
 		result = "失败"
 	}
 	if showData {
-		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Data: %#v, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,
-			processName, result, SeuxwRequest.TraceID, response.Data, response.Message, response.Pagination)
+		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Return: %s", funcInfo.FuncName, funcInfo.Line,
+			processName, result, SeuxwRequest.TraceID, string(data))
 	} else {
 		log.Trace("[%s:%d] %s流程%s～ => TraceID: %s, Message:%s, Pagination: %+v", funcInfo.FuncName, funcInfo.Line,
 			processName, result, SeuxwRequest.TraceID, response.Message, response.Pagination)
 	}
+	return data
 }

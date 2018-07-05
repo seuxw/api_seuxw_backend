@@ -37,8 +37,6 @@ func (self *server) Test(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	
-	fmt.Println("DEBUG:", date)
-
 	// 添加无值默认值 date = Today
 	if len(date) == 0 {
 		date = extension.CurrentDateInStr()
@@ -57,9 +55,8 @@ END:
 		response.Code = 1
 		response.Message = fmt.Sprintf("%s", err)
 	}
-	data, _ = json.Marshal(&response)
 
-	extension.HandlerResponseLog(seuxwRequest, response, processName, true)
+	data = extension.HandlerResponseLog(seuxwRequest, response, processName, true)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Write([]byte(data))
 }

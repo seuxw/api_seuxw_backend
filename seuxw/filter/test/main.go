@@ -14,6 +14,7 @@ type server struct {
 	ctx context.Context
 }
 
+// start 程序开始
 func (self *server) start() {
 	self.Server = web.NewServer(self.log)
 	router := self.PathPrefix("/").SubRouter()
@@ -25,10 +26,12 @@ func (self *server) start() {
 	self.Serve("0.0.0.0:10000")
 }
 
+// stop 服务终止，断开数据库连接
 func (self *server) stop() {
 	self.db.Close()
 }
 
+// main 主程序入口
 func main() {
 	log := logger.NewStdLogger(true, true, true, true, true)
 	s := &server{
