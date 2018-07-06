@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	py "github.com/sbinet/go-python"
 	"seuxw/embrice/rdb/user"
 	"seuxw/x/logger"
 	"seuxw/x/web"
@@ -9,38 +10,49 @@ import (
 
 type server struct {
 	*web.Server
-	db  *test.Database
+	db  *user.Database
 	log *logger.Logger
 	ctx context.Context
+	py  *py.PyObject
 }
 
 // start 程序开始
-func (self *server) start() {
-	self.Server = web.NewServer(self.log)
-	router := self.PathPrefix("/").SubRouter()
+func (svr *server) start() {
+	svr.Server = web.NewServer(svr.log)
+	/* 用户Handler */
+	userRouter := svr.PathPrefix("/user").SubRouter()
+	userRouter.HandleFunc("/create_user", svr.CreateUser).Methods("POST") // 创建用户
 
-	/* -测试Handler- */
-	// 测试接口 将会返回输入的日期对应的日出日落时间（需要对应时间）
-	router.HandleFunc("/test", self.Test).Methods("GET", "POST")
-
-	self.Serve("0.0.0.0:20000")
+	svr.Serve("0.0.0.0:20000")
 }
 
 // stop 服务终止，断开数据库连接
-func (self *server) stop() {
-	self.db.Close()
+func (svr *server) stop() {
+	svr.db.Close()
 }
 
 // main 主程序入口
 func main() {
 	log := logger.NewStdLogger(true, true, true, true, true)
 	s := &server{
-		db:  test.NewDB(log, 10, 10),
+		db:  user.NewDB(log, 10, 10),
 		ctx: context.TODO(),
 		log: log,
+		py:  ImportModule("/data/code/seuxw/api/api_seuxw_backend/py_seuxw/painter", "treehole"),
 	}
 
 	s.start()
 
 	defer s.stop()
+}
+
+var PyStr = py.PyString_FromString
+
+// var GoStr = py.PyString_AS_STRING
+
+func ImportModule(dir, name string) *py.PyObject {
+	sysModule := py.PyImport_ImportModule("sys") // import sys
+	path := sysModule.GetAttrString("path")      // path = sys.path
+	py.PyList_Insert(path, 0, PyStr(dir))        // path.insert(0, dir)
+	return py.PyImport_ImportModule(name)        // return __import__(name)
 }

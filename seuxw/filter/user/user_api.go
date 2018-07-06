@@ -4,51 +4,50 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"seuxw/embrice/entity/test"
 	"seuxw/embrice/entity"
+	"seuxw/embrice/entity/user"
 	"seuxw/embrice/extension"
 )
 
-func (self *server) Test(w http.ResponseWriter, r *http.Request) {
+// CreateUser 创建用户 Handler
+// 目前 *仅接受* 群内签到注册申请用户和一卡通账号用户，一般群聊用户请不要调用此接口
+func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var (
-		date 			string
-		response 		entity.Response
-		responseData    test.Test
-		err     		error
-		data 			[]byte
+		response entity.Response
+		err      error
+		data     []byte
+		user     user.User
 	)
 
 	seuxwRequest := entity.GetSeuxwRequest(r)
-	processName := "Test"
-	params := make(map[string]string, 0)
+	processName := "CreateUser"
 
 	body, _ := extension.HandlerRequestLog(seuxwRequest, processName)
 
-	// 获取date参数
-	if r.Method == "GET"{
-		date = r.FormValue("date")
+	// 参数分析
+	err = json.Unmarshal(body, &user)
 
-	} else {
-		err = json.Unmarshal(body, &params)
-		date = params["date"]
-		if err != nil {
-			err = fmt.Errorf("Json 解析错误")
-			goto END
-		}
+	if err != nil {
+		err = fmt.Errorf("Json 解析错误")
+		goto END
 	}
-	
-	// 添加无值默认值 date = Today
-	if len(date) == 0 {
-		date = extension.CurrentDateInStr()
+
+	if user.QQID == 0 && user.CardID == 0 {
+		err = fmt.Errorf("缺少必要参数 qq_id 或 card_id，请检查！")
+		goto END
+	}
+
+	// 获取用户头像图片 http://q4.qlogo.cn/g?b=qq&nk={qq_id}&s=140
+	if user.QQID != 0 {
+		svr.py.CallFunction("__main__")
 	}
 
 	// 数据库操作
-	responseData, err = self.db.Test(date)
+	err = svr.db.CreateUserDB(user)
 	if err != nil {
 		err = fmt.Errorf("数据库调用错误！ %s", err)
 		goto END
 	}
-	response.Data = responseData
 
 END:
 	if err != nil {
