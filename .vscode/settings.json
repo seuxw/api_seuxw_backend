@@ -1,3 +1,4 @@
 {
-    "python.linting.pylintEnabled": false
+    "python.linting.pylintEnabled": false,
+    "go.gopath": "/data/code/seuxw/api/api_seuxw_backend/seuxw/_output/local:/data/code/com/go"
 }

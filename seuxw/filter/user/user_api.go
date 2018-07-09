@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	py "github.com/sbinet/go-python"
 	"net/http"
 	"seuxw/embrice/entity"
 	"seuxw/embrice/entity/user"
@@ -24,6 +25,11 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	body, _ := extension.HandlerRequestLog(seuxwRequest, processName)
 
+	pyExec := svr.py.GetAttrString("exec")
+	fmt.Println(pyExec)
+	res := pyExec.Call(py.Py_None, py.Py_None)
+	fmt.Println(res)
+
 	// 参数分析
 	err = json.Unmarshal(body, &user)
 
@@ -39,7 +45,7 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// 获取用户头像图片 http://q4.qlogo.cn/g?b=qq&nk={qq_id}&s=140
 	if user.QQID != 0 {
-		svr.py.CallFunction("__main__")
+
 	}
 
 	// 数据库操作

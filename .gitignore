@@ -1,6 +1,9 @@
 *.exe
 
 _output/
+output/
 debug
 
 .vscode/
+
+*.pyc

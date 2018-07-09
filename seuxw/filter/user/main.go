@@ -38,21 +38,37 @@ func main() {
 		db:  user.NewDB(log, 10, 10),
 		ctx: context.TODO(),
 		log: log,
-		py:  ImportModule("/data/code/seuxw/api/api_seuxw_backend/py_seuxw/painter", "treehole"),
+		py:  NewPyModule("/data/code/seuxw/api/api_seuxw_backend/py_seuxw/painter", "treehole"),
 	}
-
 	s.start()
 
 	defer s.stop()
 }
 
-var PyStr = py.PyString_FromString
+var (
+	PyStr = py.PyString_FromString
+	GoStr = py.PyString_AS_STRING
+)
 
-// var GoStr = py.PyString_AS_STRING
+// NewPyModule
+func NewPyModule(dir, name string) *py.PyObject {
+	_ = py.Initialize()
+	InsertBeforeSysPath("/usr/bin/python3")
+	return ImportModule(dir, name)
+}
 
+// ImportModule
 func ImportModule(dir, name string) *py.PyObject {
 	sysModule := py.PyImport_ImportModule("sys") // import sys
 	path := sysModule.GetAttrString("path")      // path = sys.path
 	py.PyList_Insert(path, 0, PyStr(dir))        // path.insert(0, dir)
 	return py.PyImport_ImportModule(name)        // return __import__(name)
+}
+
+// InsertBeforeSysPath
+func InsertBeforeSysPath(p string) string {
+	sysModule := py.PyImport_ImportModule("sys")
+	path := sysModule.GetAttrString("path")
+	py.PyList_Insert(path, 0, PyStr(p))
+	return GoStr(path.Repr())
 }

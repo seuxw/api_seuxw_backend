@@ -3,7 +3,7 @@
 from util.img.img_blender import ImgBlender
 from util.img.img_selector import ImgSelector
 
-if __name__ == "__main__":
+def exec():
     contents = {
         'title':'小微树洞·悄悄话',
         'content_send':'小微你好，我本来喜欢一个女生。但那个女生的性格特别的man，一点都不温柔可爱，也不打算找男朋友。我该怎么办？',
@@ -15,3 +15,6 @@ if __name__ == "__main__":
     }
     img = ImgBlender(ImgSelector().img, contents)
     img.blend_type_treehole()
+
+if __name__ == "__main__":
+    exec()
