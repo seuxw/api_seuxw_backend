@@ -8,6 +8,18 @@ Backend system code for [seuxw.cc](http://seuxw.cc), based on [Golang](https://g
     项目始于 2014 年，目前项目的用户量约 6000 人次。
 ```
 
+## 0. 写在前面
+
+由于本项目使用了 git 的子模块功能，请使用
+
+```
+git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
+
+```
+
+命令克隆本项目。
+
+
 ## 1. 项目简介
 | 项目名称 | 项目中文名 | 项目团队 | 作者 | 创建日期 |
 | :-: | :-: | :-: | :-: | :-: |
