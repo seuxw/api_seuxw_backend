@@ -1,3 +1,6 @@
 [submodule "apidoc"]
 	path = apidoc
 	url = git@github.com:seuxw/apidoc.git
+[submodule "py_seuxw"]
+	path = py_seuxw
+	url = git@github.com:seuxw/py_seuxw.git
