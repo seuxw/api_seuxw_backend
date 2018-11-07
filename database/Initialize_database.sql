@@ -4,30 +4,42 @@
 create database if not exists `seuxw`;
 use `seuxw`;
 
--- 创建测试视图 sunrisetime
-drop view if exists `sunrisetime`;
-create view sunrisetime as
-select
-    *
-from
-    testsmallwei.sunrisetime;
-
------------------------
+-- ---------------------
 --  数据表前缀说明
 --  sd-     Service Dimension   服务维度表
 --  sf-     Service Fact        服务事实表
 --
 --
 --
------------------------
+-- ---------------------
 
------------------------
+-- ---------------------
 --
 --  用户项目表
 --
------------------------
+-- ---------------------
 
+-- 创建天气预报表 sf_weather
+drop table if exists `sf_weather`;
+create table `sf_weather` (
+    `weather_id` INT AUTO_INCREMENT NOT NULL COMMENT '天气log ID',
+    `date`       VARCHAR(20) NOT NULL DEFAULT '' COMMENT '日期',
+    `sun_rise_time` VARCHAR(10) NOT NULL DEFAULT '' COMMENT '日出时间',
+    `sun_down_time` VARCHAR(10) NOT NULL DEFAULT '' COMMENT '日落时间',
+    `pm25_json`     JSON NOT NULL COMMENT 'pm2.5 JSON',
+    `life_json`     JSON NOT NULL COMMENT '生活指数 JSON',
+    `temp_day`      VARCHAR(4) NOT NULL DEFAULT '' COMMENT '白天温度',
+    `temp_night`    VARCHAR(4) NOT NULL DEFAULT '' COMMENT '夜间温度',
+    `weather`       VARCHAR(11) NOT NULL DEFAULT '' COMMENT '天气',
+    `week`          VARCHAR(4) NOT NULL DEFAULT '' COMMENT '周几',
+    
+    `deleted`   INT DEFAULT 0 COMMENT '删除标记 0-未删除 1-已删除',
+    `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最近修改时间',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 
+    PRIMARY KEY (`weather_id`),
+    INDEX (`date`, `deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 创建用户表 sd_user
 drop table if exists `sd_user`;
