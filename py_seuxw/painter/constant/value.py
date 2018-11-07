@@ -1,1 +1,0 @@
-TEMPLATE_BASE_PATH = "/data/service/bin/xiaowei_treehole/constant/template"
