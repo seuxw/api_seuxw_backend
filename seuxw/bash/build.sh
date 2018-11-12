@@ -7,7 +7,8 @@ readonly SEUXW_OUTPUT_SRCPATH="${SEUXW_OUTPUT}/src"
 readonly SEUXW_OUTPUT_BINPATH="${SEUXW_OUTPUT}/bin"
 
 readonly SEUXW_TARGETS=(
-	filter/test
+	# filter/test
+	filter/user
   )
 
 eval $(go env)
