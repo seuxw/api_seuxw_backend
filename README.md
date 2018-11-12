@@ -256,3 +256,33 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
 - .gitignore Git 忽略文件
 - make.sh 快捷编译脚本
 - README.md
+
+## 5. Q&A
+
+Q: 能编译成功，但是编译后不能在本地执行怎么办？
+
+A: [build.sh](./seuxw/bash/build.sh) 的第 49 行
+
+```sh
+		CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $GO_BUILD_FLAGS \
+```
+
+指定了编译系统为 Linux。如果您是设备为 Mac，可以将 GOOS=linux 改为 GOOS=darwin。不推荐使用 Windows 系统编译这一套代码。关于 Win10 内部的 ubuntu 子系统，可以 [参考这里](https://tutorials.ubuntu.com/tutorial/tutorial-ubuntu-on-windows)。
+
+Q: 为什么执行 ./make.sh 之后，编译的是 test 项目代码，并且执行的是 test.x 二进制文件？
+
+A: 1. 项目编译问题
+
+[build.sh](./seuxw/bash/build.sh) 的第 9-11 行
+
+```sh
+readonly SEUXW_TARGETS=(
+	filter/test
+)
+```
+
+指定了编译的项目路径，可以在后面添加如 filter/user 的内容来新增需要编译的项目，同样可以删除不需要编译的项目。
+
+  2. 项目执行问题
+
+[make.sh](./seuxw/make.sh) 中的最后一行指定了需要执行的文件名称，可以在这里修改成你需要执行的项目二进制文件。
