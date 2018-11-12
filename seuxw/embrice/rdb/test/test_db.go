@@ -18,7 +18,7 @@ func (self *Database) Test(date string) (test.Test, error) {
 	select
 		count(1) as count
 	from
-		sunrisetime
+		sf_weather
 	where
 		date = ?
 	`
@@ -27,7 +27,7 @@ func (self *Database) Test(date string) (test.Test, error) {
 	select
 		date, sun_rise_time, sun_down_time
 	from
-		sunrisetime
+		sf_weather
 	where
 		date = ?
 	limit 1
