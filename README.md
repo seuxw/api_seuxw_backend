@@ -1,12 +1,10 @@
 # API\_SEUXW\_BACKEND
-Backend system code for [seuxw.cc](http://seuxw.cc), based on [Golang](https://golang.org/) and [Python3](https://www.python.org/).
-```
-    seuxw.cc 项目的 HTTP API 服务后端系统代码，基于 Golang 和 Python3 开发。
 
-    seuxw.cc 是一个以 “东大小微” 为虚拟载体，为东南大学本科生提供线上服务的平台。
-    主要提供的服务包括了学生信息查询、基础娱乐功能、个人定制功能等，服务的平台囊括 QQ Robot、 Qzone、 Web 等。
-    项目始于 2014 年，目前项目的用户量约 6000 人次。
-```
+Backend system code for [seuxw.cc](http://seuxw.cc), based on [Golang](https://golang.org/) and [Python3](https://www.python.org/).
+
+seuxw.cc 项目的 HTTP API 服务后端系统代码，基于 Golang 和 Python3 开发。
+
+seuxw.cc 是一个以 “东大小微” 为虚拟载体，为东南大学本科生提供线上服务的平台。主要提供的服务包括了学生信息查询、基础娱乐功能、个人定制功能等，服务的平台囊括 QQ Robot、 Qzone、 Web 等。项目始于 2014 年，目前项目的用户量约 6000 人次。
 
 ## 0. 写在前面
 
@@ -17,7 +15,7 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
 
 ```
 
-命令克隆本项目。
+命令克隆本项目的完整内容。
 
 
 ## 1. 项目简介
@@ -31,22 +29,22 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
 
     - 1. 属性命名
     
-    中文属性 | Englisg Property | Python | Golang |
+    中文属性 | English Property | Python | Golang |
     :-: | :-: | :-: | :-: |
-    函数 | Function | sample_func() | SampleFunc |
-    变量 | Variable | sample_var | sampleVar |
-    文件名 | File | sample_file | sample_file |
-    类 | Class | SampleClass | - |
-    类公共函数 | Class Public Function | sample_func() | - |
-    类公共属性 | Class Public Property | sample_property | - |
-    类保护函数 | Class Protected Function | \_sample\_func()\_ | - |
-    类保护属性 | Class Protected Property | \_sample\_property | - |
-    类私有函数 | Class Private Function | \_\_sample\_func()\_\_ | - |
-    类私有属性 | Class Private Property | \_\_sample\_property | - |
-    结构体 | Struct | - | sampleStruct |
-    结构体变量 | Struct Variable | - | SampleStructVariable |
-    结构体接口 | Struct Interface | - | SampleInterface |
-    标签 | Label | - | SampleLabel |
+    函数 | Function | `sample_func()` | `SampleFunc` |
+    变量 | Variable | `sample_var` | `sampleVar` |
+    文件名 | File | `sample_file` | `sample_file` |
+    类 | Class | `SampleClass` | - |
+    类公共函数 | Class Public Function | `sample_func()` | `SampleFunc()` |
+    类公共属性 | Class Public Property | `sample_property` | - |
+    类保护函数 | Class Protected Function | `_sample_func()_` | - |
+    类保护属性 | Class Protected Property | `_sample_property` | - |
+    类私有函数 | Class Private Function | `__sample_func()__` | `sampleFunc()` |
+    类私有属性 | Class Private Property | `__sample_property` | - |
+    结构体 | Struct | - | `sampleStruct` |
+    结构体变量 | Struct Variable | - | `SampleStructVariable` |
+    结构体接口 | Struct Interface | - | `SampleInterface` |
+    标签 | Label | - | `SampleLabel` |
 
     - 2. 函数块与注释位置
 
@@ -105,6 +103,7 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
 
     - Python:
         - 代码示例
+
         ```py
         try:
             sample_func()
@@ -127,8 +126,11 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
         - 说明：
             1. 将 **可预见的错误** 和 **警告** 信息放在 Exception 之前，最后只处理未知错误。
             2. err_func() 不一定是一个函数，可能只是一个日志的记录或者是个 raise。
+            3. 可以使用断言（`assert`）进行简单的抛错处理。
+
     - Golang:
-        - 推荐写法：
+        - 写法 1：
+
         ```go
         result, err := SampleFunction()
         if err != nil {
@@ -136,7 +138,9 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
             return
         }
         ```
-        - 不推荐写法：
+
+        - 写法 2：
+
         ```go
         if result, err := SampleFunction(); err !=nil {
             // 错误处理
@@ -169,20 +173,26 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
     1. **使用** cfg 文件设置配置文件 **而不是** 使用类似于 config.go 文件。
     2. sqlx 的使用
         - 查询多行数据
+
         ```go
         people := []Person{}
         db.Select(&people, "select * from person order by id asc")        
         ```
         - 查询单行数据
+
         ```go
         tau := Person{}
         err = db.Get(&tau, "select * from person where name = ?", "tau")
         ```
+
         - 执行 INSERT, UPDATE, DELETE 语句
+
         ```go
         result := db.MustExec(insertSQL)
         ```
+
         - 执行数据库事务
+
         ```go
         var (
             resultSet   []sql.Result
@@ -227,6 +237,7 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
 - `.vscode` VSCode 配置文件
 - `database` 数据库建表语句
     - Initialize_database.sql 建表语句
+- `apidoc` [API 文档项目](https://github.com/seuxw/apidoc)
 - `seuxw` Golang 项目代码
     - `_output` 在 ./seuxw 根目录下执行 make 将会在此处生成软链接
     - `bash` shell
@@ -241,31 +252,7 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
         - `extension` 扩展
         - `middleware` 中间件
         - `rdb` 数据库操作
-- `py_seuxw` Python 项目代码
-    - `painter` 绘图模块
-        - `bin` 二进制文件
-            - `ttf` 字体文件
-        - `constant` 常量
-        - `database` SQL 建表语句
-        - `util`
-    - `spider` 爬虫模块
-        - `constant` 常量
-        - `do` 爬虫调度器
-        - `database` SQL 建表语句
-        - `module`
-            - `database` MySQL 操作器
-            - `downloader` 下载器
-            - `parser` 解析器
-            - `redis` Redis 操作器
-        - `util`
-            - `common` 通用工具
-                - date.py 日期操作工具
-                - logger.py 日志工具
-                - timeout.py 超时工具
-            - `config` 配置工具
-            - `database` MySQL 操作工具
-            - `redis` Redis 操作工具
-            - `web` 代理操作工具
+- `py_seuxw` [Python 脚本项目](https://github.com/seuxw/py_seuxw)
 - .gitignore Git 忽略文件
 - make.sh 快捷编译脚本
 - README.md
