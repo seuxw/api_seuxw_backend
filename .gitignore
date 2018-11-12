@@ -7,3 +7,6 @@ debug
 .vscode/
 
 *.pyc
+
+make.sh
+build.sh
