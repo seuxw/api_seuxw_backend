@@ -7,19 +7,15 @@ import (
 
 var configPath = "/data/config/seuxw.cfg"
 
-func ReadDBConfig() (entity.Database, error) {
+func ReadDBConfig() (*entity.Database, error) {
+	config, err := ReadConfig()
+	return config.Database, err
+}
 
-	var config entity.Database
+func ReadConfig() (config entity.Config, err error) {
 
-	conf, err := ini.Load(configPath) //加载配置文件
-	if err != nil {
-		return config, err
+	if err = ini.MapTo(&config, configPath); err != nil {
+		return
 	}
-
-	conf.BlockMode = false
-	err = conf.MapTo(&config) //解析成结构体
-	if err != nil {
-		return config, err
-	}
-	return config, nil
+	return
 }
