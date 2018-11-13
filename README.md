@@ -227,7 +227,7 @@ git clone --recursive git@github.com:seuxw/api_seuxw_backend.git
 
 ## 3. 项目开始前的工作
 
-- 可以通过直接执行项目根目录的 make.sh 程序进行编译
+- 可以通过直接在项目根目录执行 `make.sh $project $os` 进行编译
 - 进入 seuxw 目录后，执行 make 可以在 seuxw/_output/local/bin 目录生成可执行程序
 - 执行完 make 后可以在 VSCode 中按 F5 进行程序调试
 - 需要在 GOPATH(/data/code/com/go) 中添加部分 VSCode 插件依赖 [下载地址](https://share.weiyun.com/5IzgLKh)
@@ -263,26 +263,8 @@ Q: 能编译成功，但是编译后不能在本地执行怎么办？
 
 A: [build.sh](./seuxw/bash/build.sh) 的第 49 行
 
-```sh
-		CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $GO_BUILD_FLAGS \
-```
-
-指定了编译系统为 Linux。如果您是设备为 Mac，可以将 GOOS=linux 改为 GOOS=darwin。不推荐使用 Windows 系统编译这一套代码。关于 Win10 内部的 ubuntu 子系统，可以 [参考这里](https://tutorials.ubuntu.com/tutorial/tutorial-ubuntu-on-windows)。
+指定了编译系统为 Mac。如果您是设备为 Linux，可以执行 `./make.sh $project linux`，其中 `$project` 为项目名称。不推荐使用 Windows 系统编译这一套代码。关于 Win10 内部的 ubuntu 子系统，可以 [参考这里](https://tutorials.ubuntu.com/tutorial/tutorial-ubuntu-on-windows)。
 
 Q: 为什么执行 ./make.sh 之后，编译的是 test 项目代码，并且执行的是 test.x 二进制文件？
 
-A: 1. 项目编译问题
-
-[build.sh](./seuxw/bash/build.sh) 的第 9-11 行
-
-```sh
-readonly SEUXW_TARGETS=(
-	filter/test
-)
-```
-
-指定了编译的项目路径，可以在后面添加如 filter/user 的内容来新增需要编译的项目，同样可以删除不需要编译的项目。
-
-  2. 项目执行问题
-
-[make.sh](./seuxw/make.sh) 中的最后一行指定了需要执行的文件名称，可以在这里修改成你需要执行的项目二进制文件。
+A: 请注意调试时的命令行 `./make.sh $porject $os`，如果直接执行，默认值会是 `./make.sh test darwin`。

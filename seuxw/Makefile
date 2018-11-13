@@ -1,8 +1,5 @@
 all: build
 
-deps:
-	go get -d -v seuxw.cc/...
-
 vet:
 	@ for f in $$(find . -type f -iregex '.*\.go' | grep -v "vendor"); do \
 		go fmt $$f; \
@@ -12,17 +9,8 @@ vet:
 		go tool vet $$f; \
 	done 
 
-updatedeps:
-	go get -d -v -u -f seuxw.cc/...
-
-testdeps:
-	go get -d -v -t seuxw.cc/...
-
-updatetestdeps:
-	go get -d -v -t -u -f seuxw.cc/...
-
 build:
-	bash/build.sh
+	bash/build.sh $$func $$os
 
 gen:
 	@ if ! which thrift > /dev/null; then \
@@ -55,12 +43,6 @@ gen:
 		rm -f $$f; \
 	done
 
-test: testdeps
-	go test -v -cpu 1,4 seuxw.cc/...
-
-testrace: testdeps
-	go test -v -race -cpu 1,4 seuxw.cc/...
-
 clean:
 	@ #go clean -i seuxw.cc/...
 	@ rm -rf _output
@@ -68,21 +50,3 @@ clean:
 	@ for d in $$(find proto/* -type 'd' | grep -v "thrift"); do \
 		rm -rf $$d; \
 	done 
-
-coverage: testdeps
-	./coverage.sh --coveralls
-
-.PHONY: \
-	all \
-	deps \
-	vet	\
-	updatedeps \
-	testdeps \
-	updatetestdeps \
-	build \
-	gen \
-	test \
-	testrace \
-	clean \
-	coverage
-
