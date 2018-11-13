@@ -37,8 +37,23 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		goto END
 	}
 
-	// 获取用户头像图片 http://q4.qlogo.cn/g?b=qq&nk={qq_id}&s=140
+	// 获取用户 QQ 信息
 	if user.QQID != 0 {
+		// todo: 通过已登录账号的 cookies 和目标用户的 QQ 账号获取其他用户的基础信息
+		// 实现方案1：grpc 或者 NATS 延迟调用py脚本
+		// 实现方案2：添加函数执行
+
+		// 获取用户头像图片 http://q4.qlogo.cn/g?b=qq&nk={qq_id}&s=140
+
+	}
+
+	// 获取用户一卡通信息
+	if user.CardID != 0 {
+		// todo: 通过一卡通账号获取用户基础信息
+		// 实现方案1：grpc 或者 NATS 延迟调用py脚本
+
+		// 获取基础信息 http://xk.urp.seu.edu.cn/jw_service/service/stuCurriculum.action
+		// 18 级以后课表需要统一身份认证
 
 	}
 

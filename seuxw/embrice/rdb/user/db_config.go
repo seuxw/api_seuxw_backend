@@ -15,7 +15,9 @@ type Database struct {
 }
 
 func NewDB(log *logger.Logger, maxConns, maxIdles int) *Database {
+
 	config, err := config.ReadDBConfig()
+
 	if err != nil {
 		log.Fatal("Connected to database failed. Please check the config file. Err:%s", err)
 	}

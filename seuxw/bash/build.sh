@@ -7,8 +7,8 @@ readonly SEUXW_OUTPUT_SRCPATH="${SEUXW_OUTPUT}/src"
 readonly SEUXW_OUTPUT_BINPATH="${SEUXW_OUTPUT}/bin"
 
 readonly SEUXW_TARGETS=(
-	filter/test
-  )
+	filter/$1
+)
 
 eval $(go env)
 
@@ -46,7 +46,7 @@ seuxw_build_target() {
 
 	for arg; do
 		# echo "target: ${arg}, ${arg##*/}"
-		CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $GO_BUILD_FLAGS \
+		CGO_ENABLED=0 GOOS=$2 GOARCH=amd64 go build $GO_BUILD_FLAGS \
 		-installsuffix cgo -ldflags "$GO_LDFLAGS" \
 		-o ${SEUXW_OUTPUT_BINPATH}/${arg##*/}.x seuxw/${arg} || return
 	done
