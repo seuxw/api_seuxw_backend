@@ -6,18 +6,15 @@ import (
 )
 
 // CreateUserDB 用户创建 DB 操作
-func (db *Database) CreateUserDB(user user.User) error {
+func (db *Database) CreateUserDB(user *user.User) error {
 	var (
 		insertSQL           string
 		insertID            int64
 		selectCheckSQL      string
 		selectCheckWhereStr string
-		count               int
-		insertFlag          bool
 		err                 error
+		count               int
 	)
-
-	insertFlag = false
 
 	selectCheckSQL = `
 	select
@@ -25,7 +22,7 @@ func (db *Database) CreateUserDB(user user.User) error {
 	from
 		sd_user
 	where
-		%s
+		%s and deleted = 0
 	`
 
 	insertSQL = `
@@ -46,7 +43,7 @@ func (db *Database) CreateUserDB(user user.User) error {
 		insertID = user.CardID
 	}
 
-	err = db.Get(&count, fmt.Sprintf(selectCheckSQL, selectCheckWhereStr), user.QQID)
+	err = db.Get(&count, fmt.Sprintf(selectCheckSQL, selectCheckWhereStr), insertID)
 	if err != nil {
 		err = fmt.Errorf("数据库预查询错误 err:%s", err)
 		goto END
@@ -54,19 +51,13 @@ func (db *Database) CreateUserDB(user user.User) error {
 
 	// 插入操作
 	if count == 0 {
-		insertFlag = true
-	} else {
-		err = fmt.Errorf("用户 %d 已经存在！", insertID)
-	}
-
-	if insertFlag {
 		_ = db.MustExec(
 			insertSQL, user.CardID, user.QQID, user.WeChatID,
 			user.StuNo, user.RealName, user.NickName, user.Gender,
 			user.UserType, user.Pwd, user.Session, user.Mobile)
+	} else {
+		err = fmt.Errorf("用户 %d 已经存在！", insertID)
 	}
-
-	fmt.Println("测试完成！")
 
 END:
 	return err

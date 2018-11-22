@@ -8,14 +8,14 @@ use `seuxw`;
 --  数据表前缀说明
 --  sd-     Service Dimension   服务维度表
 --  sf-     Service Fact        服务事实表
---
+--  dic-    Dict Table          枚举表
 --
 --
 -- ---------------------
 
 -- ---------------------
---
---  用户项目表
+-- test 项目表
+--  
 --
 -- ---------------------
 
@@ -41,10 +41,17 @@ create table `sf_weather` (
     INDEX (`date`, `deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ---------------------
+-- user 项目表
+--  
+--
+-- ---------------------
+
 -- 创建用户表 sd_user
 drop table if exists `sd_user`;
 create table `sd_user` (
     `user_id`   INT AUTO_INCREMENT NOT NULL COMMENT '用户 ID 用户唯一标识符',
+    `user_uuid` VARCHAR(31) NOT NULL DEFAULT '' COMMENT '用户 用户唯一标识符 uuid',
     `card_id`   INT NOT NULL DEFAULT 0 COMMENT '学生一卡通编号',
     `qq_id`     INT NOT NULL DEFAULT 0 COMMENT '用户绑定 QQ 账号',
     `wechat_id` INT NOT NULL DEFAULT 0 COMMENT '用户绑定微信账号',
@@ -63,12 +70,30 @@ create table `sd_user` (
     PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 创建学院字典表 dic_dept
+drop table if exists `dict_dept`;
+create table `dict_dept` (
+    `dept_id`           INT AUTO_INCREMENT NOT NULL COMMENT '院系 ID 自增',
+    `dept_no`           VARCHAR(7) NOT NULL DEFAULT '' COMMENT '院系编号 如 01',
+    `dept_name`         VARCHAR(15) NOT NULL DEFAULT '' COMMENT '院系名称',
+    `dept_full_name`    VARCHAR(31) NOT NULL DEFAULT '' COMMENT '院系全称',
+    `base`              INT NOT NULL DEFAULT 0 COMMENT '校区 1-jlh 2-spl 3-djq',
+
+    `deleted`   INT DEFAULT 0 COMMENT '删除标记 0-未删除 1-已删除',
+    `modify_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最近修改时间',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+
+    PRIMARY KEY (`dept_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 创建一卡通信息表 sd_card
 drop table if exists `sd_card`;
 create table `sd_card` (
     `card_id`   INT NOT NULL DEFAULT 0 COMMENT '学生一卡通编号',
     `real_name` VARCHAR(15) NOT NULL DEFAULT '' COMMENT '用户真实姓名',
+    `identity`  INT(2) NOT NULL DEFAULT 0 COMMENT '用户身份 0-未知 1-本科生 2-硕士研究生 3-博士研究生 4-教师 5-临时卡',
     `stu_no`    VARCHAR(15) NOT NULL DEFAULT '' COMMENT '学生学号',
+    `class`     VARCHAR(2) NOT NULL DEFAULT '' COMMENT '学生班级',
     `dept_no`   VARCHAR(7) NOT NULL DEFAULT '' COMMENT '学院编号',
     `dept_name` VARCHAR(15) NOT NULL DEFAULT '' COMMENT '学院名称',
     `major_name`VARCHAR(7) NOT NULL DEFAULT '' COMMENT '专业名称',
