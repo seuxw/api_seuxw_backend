@@ -51,7 +51,7 @@ create table `sf_weather` (
 drop table if exists `sd_user`;
 create table `sd_user` (
     `user_id`   INT AUTO_INCREMENT NOT NULL COMMENT '用户 ID 用户唯一标识符',
-    `user_uuid` VARCHAR(31) NOT NULL DEFAULT '' COMMENT '用户 用户唯一标识符 uuid',
+    `user_uuid` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '用户 用户唯一标识符 uuid',
     `card_id`   INT NOT NULL DEFAULT 0 COMMENT '学生一卡通编号',
     `qq_id`     INT NOT NULL DEFAULT 0 COMMENT '用户绑定 QQ 账号',
     `wechat_id` INT NOT NULL DEFAULT 0 COMMENT '用户绑定微信账号',
@@ -142,8 +142,8 @@ select
     q.address, q.hometown, q.birthday, q.vip, q.vip_level
 from
     sd_user as u
-inner join sd_card as c on c.card_id = u.card_id and c.deleted = 0
-inner join sd_qq as q on q.qq_id = u.qq_id and q.deleted = 0
+left join sd_card as c on c.card_id = u.card_id and c.deleted = 0
+left join sd_qq as q on q.qq_id = u.qq_id and q.deleted = 0
 where
     u.deleted = 0;
 
@@ -154,6 +154,6 @@ select
     u.user_id, u.pwd, u.mobile, u.session, c.pwd_card, c.pwd_money
 from
     sd_user as u
-inner join sd_card as c on c.card_id = u.card_id and c.deleted = 0
+left join sd_card as c on c.card_id = u.card_id and c.deleted = 0
 where
     u.deleted = 0;

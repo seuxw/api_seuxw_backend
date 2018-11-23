@@ -74,10 +74,12 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		goto END
 	}
 
-	err = svr.db.CreateCardDB(cardObj)
-	if err != nil {
-		err = fmt.Errorf("数据库调用错误！ %s", err)
-		goto END
+	if userObj.CardID != 0 {
+		err = svr.db.CreateCardDB(cardObj)
+		if err != nil {
+			err = fmt.Errorf("数据库调用错误！ %s", err)
+			goto END
+		}
 	}
 
 END:

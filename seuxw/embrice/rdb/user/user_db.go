@@ -27,10 +27,10 @@ func (db *Database) CreateUserDB(user *user.User) error {
 
 	insertSQL = `
 	insert into sd_user (
-		card_id, qq_id, wechat_id, stu_no, real_name, 
+		card_id, user_uuid, qq_id, wechat_id, stu_no, real_name,
 		nick_name, gender, user_type, pwd, session, mobile
 	) values (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)
 	`
 
@@ -52,7 +52,7 @@ func (db *Database) CreateUserDB(user *user.User) error {
 	// 插入操作
 	if count == 0 {
 		_ = db.MustExec(
-			insertSQL, user.CardID, user.QQID, user.WeChatID,
+			insertSQL, user.CardID, user.UserUUID, user.QQID, user.WeChatID,
 			user.StuNo, user.RealName, user.NickName, user.Gender,
 			user.UserType, user.Pwd, user.Session, user.Mobile)
 	} else {
