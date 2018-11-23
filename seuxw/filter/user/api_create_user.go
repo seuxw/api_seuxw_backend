@@ -65,6 +65,8 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	userObj.UserUUID = extension.NewUUIDString()
+
 	// 数据库操作
 	err = svr.db.CreateUserDB(userObj)
 	if err != nil {
