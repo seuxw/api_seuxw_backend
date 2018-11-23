@@ -131,14 +131,14 @@ create table `sd_qq` (
 drop view if exists `v_insensitive_userinfo`;
 create view v_insensitive_userinfo as
 select
-    u.user_id, u.card_id, u.qq_id, u.wechat_id, u.stu_no,
+    u.user_id, u.user_uuid, u.card_id, u.qq_id, u.wechat_id, u.stu_no,
     u.real_name, u.nick_name, 
     case 
         when c.gender <> 0 then c.gender 
         when q.gender <> 0 then q.gender 
         else 0 
     end as gender,
-    u.user_type, c.dept_name, c.major_name, c.grade, c.identity, c.class
+    u.user_type, c.dept_name, c.major_name, c.grade, c.identity, c.class,
     q.rmk_name, q.address, q.hometown, q.birthday, q.vip, q.vip_level
 from
     sd_user as u
@@ -151,7 +151,7 @@ where
 drop view if exists `v_sensitive_userinfo`;
 create view v_sensitive_userinfo as
 select
-    u.user_id, u.uuid, u.pwd, u.mobile, u.session, c.pwd_card, c.pwd_money
+    u.user_id, u.user_uuid, u.pwd, u.mobile, u.session, c.pwd_card, c.pwd_money
 from
     sd_user as u
 inner join sd_card as c on c.card_id = u.card_id and c.deleted = 0

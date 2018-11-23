@@ -35,6 +35,7 @@ func (svr *server) GetUserByUUID(w http.ResponseWriter, r *http.Request) {
 
 GET:
 	uuid = r.FormValue("uuid")
+	goto DB
 
 POST:
 	if err = json.Unmarshal(body, &reqData); err != nil {
@@ -42,10 +43,17 @@ POST:
 	}
 	uuid = reqData.UUID
 
+DB:
 	if len(uuid) < 10 {
 		err = fmt.Errorf("UUID 长度非法")
 		goto END
 	}
+
+	if respData, err = svr.db.GetUserByUUID(uuid); err != nil {
+		goto END
+	}
+
+	response.Data = respData
 
 END:
 	if err != nil {

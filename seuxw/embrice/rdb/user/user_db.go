@@ -62,3 +62,30 @@ func (db *Database) CreateUserDB(user *user.User) error {
 END:
 	return err
 }
+
+// GetUserByUUID .
+func (db *Database) GetUserByUUID(UUID string) (user.GetUserByUUIDResp, error) {
+	var (
+		selectSQL string
+		userInfo  user.GetUserByUUIDResp
+		err       error
+	)
+
+	selectSQL = `
+	select
+		address, birthday, card_id, dept_name, gender,
+		grade, hometown, major_name, nick_name, qq_id,
+		real_name, rmk_name, stu_no, user_type, vip,
+		vip_level, wechat_id, identity
+	from
+		v_insensitive_userinfo
+	where
+		user_uuid = ?
+	`
+
+	if err = db.Get(&userInfo, selectSQL, UUID); err != nil {
+		err = fmt.Errorf("数据库查询错误 err:%s", err)
+	}
+
+	return userInfo, err
+}
