@@ -19,7 +19,8 @@ func (svr *server) start() {
 	svr.Server = web.NewServer(svr.log)
 	/* 用户Handler */
 	userRouter := svr.PathPrefix("/user").SubRouter()
-	userRouter.HandleFunc("/create_user", svr.CreateUser).Methods("POST") // 创建用户
+	userRouter.HandleFunc("/create_user", svr.CreateUser).Methods("POST")                // 创建用户
+	userRouter.HandleFunc("/get_user_by_uuid", svr.GetUserByUUID).Methods("GET", "POST") // 查询用户信息
 
 	svr.Serve("0.0.0.0:20000")
 }
