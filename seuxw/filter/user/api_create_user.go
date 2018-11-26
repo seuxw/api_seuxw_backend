@@ -65,6 +65,8 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	userObj.UserUUID = extension.NewUUIDString()
+
 	// 数据库操作
 	err = svr.db.CreateUserDB(userObj)
 	if err != nil {
@@ -72,10 +74,12 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		goto END
 	}
 
-	err = svr.db.CreateCardDB(cardObj)
-	if err != nil {
-		err = fmt.Errorf("数据库调用错误！ %s", err)
-		goto END
+	if userObj.CardID != 0 {
+		err = svr.db.CreateCardDB(cardObj)
+		if err != nil {
+			err = fmt.Errorf("数据库调用错误！ %s", err)
+			goto END
+		}
 	}
 
 END:
