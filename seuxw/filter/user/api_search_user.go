@@ -19,7 +19,7 @@ func (svr *server) GetUserByUUID(w http.ResponseWriter, r *http.Request) {
 		data     []byte
 		uuid     string
 		reqData  user.GetUserByUUIDReq
-		respData user.GetUserByUUIDResp
+		respData *user.GetUserByUUIDResp
 	)
 
 	seuxwRequest := entity.GetSeuxwRequest(r)
@@ -49,10 +49,9 @@ DB:
 		goto END
 	}
 
-	if respData, err = svr.db.GetUserByUUID(uuid); err != nil {
+	if respData, err = svr.db.GetUserByUUIDDB(uuid); err != nil {
 		goto END
 	}
-
 	response.Data = respData
 
 END:

@@ -67,7 +67,6 @@ type GetUserSInfoByUUIDResp struct {
 // InsensitiveUserInfo 脱敏用户信息
 type InsensitiveUserInfo struct {
 	CardID   int64  `json:"card_id" db:"card_id"`     // 学生一卡通编号
-	QQID     int64  `json:"qq_id" db:"qq_id"`         // 用户绑定 QQ 账号
 	WeChatID int64  `json:"wechat_id" db:"wechat_id"` // 用户绑定微信账号
 	StuNo    string `json:"stu_no" db:"stu_no"`       // 学生学号
 	RealName string `json:"real_name" db:"real_name"` // 用户真实姓名

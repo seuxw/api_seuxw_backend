@@ -27,10 +27,10 @@ func (db *Database) CreateUserDB(user *user.User) error {
 
 	insertSQL = `
 	insert into sd_user (
-		card_id, qq_id, wechat_id, stu_no, real_name, 
+		card_id, user_uuid, qq_id, wechat_id, stu_no, real_name,
 		nick_name, gender, user_type, pwd, session, mobile
 	) values (
-		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 	)
 	`
 
@@ -52,7 +52,7 @@ func (db *Database) CreateUserDB(user *user.User) error {
 	// 插入操作
 	if count == 0 {
 		_ = db.MustExec(
-			insertSQL, user.CardID, user.QQID, user.WeChatID,
+			insertSQL, user.CardID, user.UserUUID, user.QQID, user.WeChatID,
 			user.StuNo, user.RealName, user.NickName, user.Gender,
 			user.UserType, user.Pwd, user.Session, user.Mobile)
 	} else {
@@ -63,29 +63,30 @@ END:
 	return err
 }
 
-// GetUserByUUID .
-func (db *Database) GetUserByUUID(UUID string) (user.GetUserByUUIDResp, error) {
+// GetUserByUUIDDB
+func (db *Database) GetUserByUUIDDB(uuid string) (*user.GetUserByUUIDResp, error) {
 	var (
 		selectSQL string
-		userInfo  user.GetUserByUUIDResp
 		err       error
+		rtnData   user.GetUserByUUIDResp
 	)
 
 	selectSQL = `
 	select
-		address, birthday, card_id, dept_name, gender,
-		grade, hometown, major_name, nick_name, qq_id,
-		real_name, rmk_name, stu_no, user_type, vip,
-		vip_level, wechat_id, identity
+		card_id, qq_id, wechat_id, stu_no, real_name, nick_name,
+		gender, user_type, identity, class, dept_name, major_name,
+		grade, nick_name, vip, vip_level, rmk_name, hometown,
+		address, birthday
 	from
 		v_insensitive_userinfo
 	where
 		user_uuid = ?
 	`
 
-	if err = db.Get(&userInfo, selectSQL, UUID); err != nil {
-		err = fmt.Errorf("数据库查询错误 err:%s", err)
+	if err = db.Get(&rtnData, selectSQL, uuid); err != nil {
+		goto END
 	}
 
-	return userInfo, err
+END:
+	return &rtnData, err
 }
