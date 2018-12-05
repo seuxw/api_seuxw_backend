@@ -25,6 +25,7 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	processName := "CreateUser"
 	userObj := new(user.User)
 	cardObj := new(user.Card)
+	qqObj := new(user.QQ)
 
 	body, _ := extension.HandlerRequestLog(seuxwRequest, processName)
 
@@ -48,6 +49,7 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		// 实现方案2：添加函数执行
 
 		// 获取用户头像图片 http://q4.qlogo.cn/g?b=qq&nk={qq_id}&s=140
+		qqObj.QQID = userObj.QQID
 
 	}
 
@@ -65,6 +67,8 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	userObj.UserUUID = extension.NewUUIDString()
+
 	// 数据库操作
 	err = svr.db.CreateUserDB(userObj)
 	if err != nil {
@@ -72,10 +76,20 @@ func (svr *server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		goto END
 	}
 
-	err = svr.db.CreateCardDB(cardObj)
-	if err != nil {
-		err = fmt.Errorf("数据库调用错误！ %s", err)
-		goto END
+	if userObj.CardID != 0 {
+		err = svr.db.CreateCardDB(cardObj)
+		if err != nil {
+			err = fmt.Errorf("数据库调用错误！ %s", err)
+			goto END
+		}
+	}
+
+	if userObj.QQID != 0 {
+		err = svr.db.CreateQQDB(qqObj)
+		if err != nil {
+			err = fmt.Errorf("数据库调用错误！ %s", err)
+			goto END
+		}
 	}
 
 END:
