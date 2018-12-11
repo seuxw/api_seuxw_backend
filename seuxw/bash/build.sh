@@ -6,8 +6,24 @@ readonly SEUXW_OUTPUT="${SEUXW_ROOT}/_output/local"
 readonly SEUXW_OUTPUT_SRCPATH="${SEUXW_OUTPUT}/src"
 readonly SEUXW_OUTPUT_BINPATH="${SEUXW_OUTPUT}/bin"
 
+# get args
+os="darwin"
+func="test"
+
+while getopts 'o:f:' args
+do
+case $args in
+	o) os=$OPTARG ;;
+	f) func=$OPTARG ;;
+	*) echo "unkonwn args" ;;
+esac
+done
+
+echo "Func:" $func, "OS:" $os
+
+
 readonly SEUXW_TARGETS=(
-	filter/$1
+	filter/$func
 )
 
 eval $(go env)
@@ -46,7 +62,7 @@ seuxw_build_target() {
 
 	for arg; do
 		# echo "target: ${arg}, ${arg##*/}"
-		CGO_ENABLED=0 GOOS=$2 GOARCH=amd64 go build $GO_BUILD_FLAGS \
+		CGO_ENABLED=0 GOOS=$os GOARCH=amd64 go build $GO_BUILD_FLAGS \
 		-installsuffix cgo -ldflags "$GO_LDFLAGS" \
 		-o ${SEUXW_OUTPUT_BINPATH}/${arg##*/}.x seuxw/${arg} || return
 	done

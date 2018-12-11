@@ -10,7 +10,7 @@ vet:
 	done 
 
 build:
-	bash/build.sh $$func $$os
+	bash/build.sh -f $$func -o $$os
 
 gen:
 	@ if ! which thrift > /dev/null; then \
