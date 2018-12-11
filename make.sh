@@ -15,6 +15,7 @@ else
 fi
 
 cd seuxw
+
 make build func=$func os=$os
 
 ./_output/local/bin/$func.x 

@@ -1,15 +1,15 @@
 package extension
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"math"
+	"runtime"
 	"seuxw/embrice/entity"
 	"seuxw/x/logger"
-	"time"
 	"strings"
-	"runtime"
-	"io/ioutil"
+	"time"
 )
 
 const TIME_FORMAT = "2006-01-02 15:04:05"
@@ -104,7 +104,7 @@ func HandlerRequestLog(SeuxwRequest *entity.SeuxwRequest, processName string) ([
 		log.Trace("[%s:%d] %s流程开始～ => TraceID: %s, URI: %s, UsrID: %d, UsrNm: %s", funcInfo.FuncName, funcInfo.Line, processName,
 			SeuxwRequest.TraceID, SeuxwRequest.Action, SeuxwRequest.AccountID, SeuxwRequest.RealName)
 	} else if method == "POST" {
-		
+
 		log.Trace("[%s:%d] %s流程开始～ => TraceID: %s, URI: %s, Params: %s, UsrID: %d, UsrNm: %s", funcInfo.FuncName, funcInfo.Line, processName,
 			SeuxwRequest.TraceID, SeuxwRequest.Action, string(body), SeuxwRequest.AccountID, SeuxwRequest.RealName)
 	} else {
@@ -114,7 +114,7 @@ func HandlerRequestLog(SeuxwRequest *entity.SeuxwRequest, processName string) ([
 }
 
 // HandlerResponseLog 路由层请求添加Log日志
-func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Response, processName string, showData bool) []byte{
+func HandlerResponseLog(SeuxwRequest *entity.SeuxwRequest, response entity.Response, processName string, showData bool) []byte {
 	var (
 		result string
 	)
